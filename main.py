@@ -25,10 +25,10 @@ def main():
         print(f"Alphabet: {alphabet}")
         print(f"States: {states}")
     else:
-        # TODO: Real hw, not testing.
         strings_filename = 'machines/strings.txt'
         folder_dir = 'machines/'
-        for i in range(0, 36):
+        low_range, high_range = 0, 36
+        for i in range(low_range, high_range):
             machine_filename = folder_dir + 'm' + ('%02d' % i) + '.fa'
             print(f"Machine Name: {machine_filename}")
             accept_states, input_output_states, machine_type, alphabet, states \
@@ -75,7 +75,6 @@ def run_machine(accept_states, input_output_states, machine_type, input_string):
                 else:
                     current_state = input_output_states[current_state][symbol]
     else:
-        # TODO: NFA logic
         # With NFAs, for every state, branch off into all possible transitions.
         # Contains transition state, symbol, and remaining string (using an index).
         possible_routes = [(current_state, 0)]
