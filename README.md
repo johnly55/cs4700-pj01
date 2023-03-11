@@ -20,9 +20,11 @@ The first machine will have a base name of
 m00 and the remaining machines will be numbered sequentially. This should allow you to write
 a wrapper program that processes all of the machines in a single run.
 
+## Input
+- Input file: strings.txt (the same file for all machines)
+- Machine description file: basename.fa
+
 ## Output
 
-- Machine description file: basename.fa
 - Accepted strings: basename.txt
 - Log file: fa.log
-- Input file: strings.txt (the same file for all machines)
