@@ -7,7 +7,7 @@ EPSILON = 'epsilon'
 
 
 def main():
-    is_test = True
+    is_test = False
     if is_test:
         machine_filename = 'machine_example.fa'
         strings_filename = 'strings_example.txt'
@@ -26,10 +26,27 @@ def main():
         print(f"States: {states}")
     else:
         # TODO: Real hw, not testing.
-        pass
+        strings_filename = 'machines/strings.txt'
+        folder_dir = 'machines/'
+        for i in range(0, 36):
+            machine_filename = folder_dir + 'm' + ('%02d' % i) + '.fa'
+            print(f"Machine Name: {machine_filename}")
+            accept_states, input_output_states, machine_type, alphabet, states \
+                = read_machine_info(machine_filename)
+
+            if accept_states is None:
+                return
+
+            read_write_strings(strings_filename, machine_filename, accept_states,
+                               input_output_states, machine_type, len(states), len(alphabet))
+            print(f"Accept States: {accept_states}")
+            print(f"Input and Output States:\n{input_output_states}")
+            print(f"Machine Type: {machine_type}")
+            print(f"Alphabet: {alphabet}")
+            print(f"States: {states}")
+            print('\n')
 
 
-# TODO: deal with DFA and NFA
 def run_machine(accept_states, input_output_states, machine_type, input_string):
     """
     Runs the machine with the inputted string with either DFA or NFA logic.
@@ -179,7 +196,10 @@ def log_file(machine_filename, machine_type, num_states, size_alphabet, num_vali
     output_file = machine_filename[:-3]
     output_file += '.log'
     with open(output_file, 'w') as file:
-        file.write(f'<{machine_filename[:-3]}>,<{machine_type}>,<{num_states}>,<{size_alphabet}>,<{num_valid_strings}>')
+        new_name = output_file
+        if '/' in new_name:
+            new_name = new_name.split('/')[1]
+        file.write(f"<{new_name[:-4]}>,<{machine_type}>,<{num_states}>,<{size_alphabet}>,<{num_valid_strings}>")
 
 
 def is_input_valid(input_str, is_state):
