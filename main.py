@@ -199,7 +199,7 @@ def log_file(machine_filename, machine_type, num_states, size_alphabet, num_vali
         new_name = output_file
         if '/' in new_name:
             new_name = new_name.split('/')[1]
-        file.write(f"<{new_name[:-4]}>,<{machine_type}>,<{num_states}>,<{size_alphabet}>,<{num_valid_strings}>")
+        file.write(f"{new_name[:-4]},{machine_type},{num_states},{size_alphabet},{num_valid_strings}")
 
 
 def is_input_valid(input_str, is_state):
