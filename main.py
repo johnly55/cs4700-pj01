@@ -1,5 +1,9 @@
 import logging
 
+INV = 'INV'
+DFA = 'DFA'
+NFA = 'NFA'
+
 
 def main():
     is_test = True
@@ -12,6 +16,9 @@ def main():
         if accept_states is None:
             return
 
+        if machine_type != INV:
+            read_strings(strings_filename, accept_states, input_output_states, machine_type)
+
         print(f"Accept States: {accept_states}")
         print(f"Input and Output States:\n{input_output_states}")
         print(f"Machine Type: {machine_type}")
@@ -19,13 +26,43 @@ def main():
         print(f"States: {states}")
         # TODO: build function to pass strings in.
         # print(f"Number of Strings Accepted: {some number}")
-        read_strings(strings_filename, accept_states, input_output_states, machine_type)
     else:
         pass
 
 
+# TODO: deal with DFA and NFA
 def run_machine(accept_states, input_output_states, machine_type, input_string):
-    return 0
+    """
+
+    :param list accept_states:
+    :param dict input_output_states:
+    :param str machine_type:
+    :param str input_string:
+    :return: was the string accepted?
+    :rtype: int
+    """
+    current_state = '0'
+    if machine_type == DFA:
+        # If epsilon, skip it.
+        if input_string != 'epsilon':
+            # Go through each symbol in the inputted string.
+            for symbol in input_string:
+                # If the current state is 255, make a new entry for it.
+                if current_state not in input_output_states:
+                    input_output_states[current_state] = {}
+
+                # Say a state doesn't explicitly say where a symbol will go,
+                # infer that it will go to state 255.
+                if symbol not in input_output_states[current_state]:
+                    input_output_states[current_state][symbol] = '255'
+                else:
+                    current_state = input_output_states[current_state][symbol]
+    else:
+        # TODO: NFA logic
+        pass
+
+    # If the last state is in one of the accept states, it's a valid string.
+    return 1 if current_state in accept_states else 0
 
 
 def read_strings(filename, accept_states, input_output_states, machine_type):
@@ -42,16 +79,29 @@ def read_strings(filename, accept_states, input_output_states, machine_type):
     valid_strings = 0
 
     try:
-        with open(filename, 'r') as file:
+        with open(file_loc, 'r') as file:
             for line in file.readlines():
-                input_string = line.strip()
+                input_string = line  # Can't strip, new to keep spaces.
+                # Remove any newline character.
+                if '\n' in input_string:
+                    input_string = input_string[:-1]
+
                 # If line is empty, the input is epsilon.
                 if len(input_string) == 0:
                     input_string = 'epsilon'
-                valid_strings += run_machine(accept_states, input_output_states, machine_type, input_string)
+                is_valid = run_machine(accept_states, input_output_states, machine_type, input_string)
+                # print(f"String {line} is valid: {is_valid}")
+                valid_strings += is_valid
     except FileNotFoundError:
-        logging.exception(f"ERROR: The strings file does not exist! Filename: {filename}")
+        logging.exception(f"The strings file does not exist! Filename: {filename}")
+    except KeyError:
+        logging.exception(f"The dict: {input_output_states} \ndoes not have a key used by the string: {line}")
 
+    print(f"Valid Strings: {valid_strings}")
+
+
+def write_strings_to_file(filename, input_string):
+    pass
 
 def is_input_valid(input_str, is_state):
     """
@@ -91,7 +141,7 @@ def read_machine_info(filename):
     """
     accept_states = None
     input_output_states = {}
-    machine_type = 'DFA'
+    machine_type = DFA
     alphabet = []
     states = []
 
@@ -125,6 +175,8 @@ def read_machine_info(filename):
                     # The other exception must be an epsilon.
                     else:
                         items[1] = 'epsilon'
+                        if machine_type != INV:
+                            machine_type = NFA
 
                 # Add each item to their respective category.
                 if items[0] not in states:
@@ -145,8 +197,8 @@ def read_machine_info(filename):
                     input_output_states[items[0]][items[1]] = items[2]
                 # There is a same input state/symbol combination meaning, it's an NFA.
                 else:
-                    if machine_type != 'INV':
-                        machine_type = 'NFA'
+                    if machine_type != INV:
+                        machine_type = NFA
                     new_symbol = items[1]
                     # A dict cannot have 2 of the same keys going to a different value.
                     # We will append a * to the symbol name to differentiate it, and this
@@ -159,7 +211,7 @@ def read_machine_info(filename):
                 for i in range(len(items)):
                     is_state = True if i % 2 == 0 else False  # Is a state is in 0th or 2nd index.
                     if not is_input_valid(items[i], is_state):
-                        machine_type = 'INV'
+                        machine_type = INV
     except FileNotFoundError:
         logging.exception(f"The machine file does not exist! Filename: {filename}")
 
