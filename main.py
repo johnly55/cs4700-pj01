@@ -10,7 +10,7 @@ def main():
     is_test = False
     if is_test:
         machine_filename = 'machine_example.fa'
-        strings_filename = 'strings_example.txt'
+        strings_filename = 'machines/strings.txt'
         accept_states, input_output_states, machine_type, alphabet, states \
             = read_machine_info(machine_filename)
 
@@ -25,11 +25,19 @@ def main():
         print(f"Alphabet: {alphabet}")
         print(f"States: {states}")
     else:
+        is_working_on_pj01 = True
         strings_filename = 'machines/strings.txt'
-        folder_dir = 'machines/'
-        low_range, high_range = 0, 36
+        if is_working_on_pj01:
+            file_chr = 'm'
+            folder_dir = 'machines/'       # For PJ01 uses.
+            low_range, high_range = 0, 36  # For PJ01 uses.
+        else:
+            file_chr = 'p'
+            folder_dir = '../PJ02/machines/'  # For PJ02 uses.
+            low_range, high_range = 0, 5      # For PJ02 uses.
+
         for i in range(low_range, high_range):
-            machine_filename = folder_dir + 'm' + ('%02d' % i) + '.fa'
+            machine_filename = folder_dir + file_chr + ('%02d' % i) + '.fa'
             print(f"Machine Name: {machine_filename}")
             accept_states, input_output_states, machine_type, alphabet, states \
                 = read_machine_info(machine_filename)
@@ -72,8 +80,7 @@ def run_machine(accept_states, input_output_states, machine_type, input_string):
                 # infer that it will go to state 255.
                 if symbol not in input_output_states[current_state]:
                     input_output_states[current_state][symbol] = '255'
-                else:
-                    current_state = input_output_states[current_state][symbol]
+                current_state = input_output_states[current_state][symbol]
     else:
         # With NFAs, for every state, branch off into all possible transitions.
         # Contains transition state, symbol, and remaining string (using an index).
