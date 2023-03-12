@@ -25,7 +25,7 @@ def main():
         print(f"Alphabet: {alphabet}")
         print(f"States: {states}")
     else:
-        is_working_on_pj01 = True
+        is_working_on_pj01 = False
         strings_filename = 'machines/strings.txt'
         if is_working_on_pj01:
             file_chr = 'm'
@@ -204,7 +204,7 @@ def log_file(machine_filename, machine_type, num_states, size_alphabet, num_vali
     with open(output_file, 'w') as file:
         new_name = output_file
         if '/' in new_name:
-            new_name = new_name.split('/')[1]
+            new_name = new_name.split('/')[-1]
         file.write(f"{new_name[:-4]},{machine_type},{num_states},{size_alphabet},{num_valid_strings}")
 
 
