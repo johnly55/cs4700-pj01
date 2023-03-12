@@ -163,7 +163,7 @@ def read_write_strings(strings_filename, machine_filename, accept_states,
     output_file += '.txt'
 
     if machine_type == 'INV':
-        log_file(machine_filename, machine_type, num_states, size_alphabet, num_valid_strings)
+        log_file(machine_filename, machine_type, -1, -1, -1)
     else:
         try:
             with open(strings_filename, 'r') as infile, open(output_file, 'w') as outfile:
@@ -215,7 +215,7 @@ def is_input_valid(input_str, is_state):
     if is_state:
         # Convert to state number to int and set not valid if more than 255.
         state_num = int(input_str)
-        if state_num > 255:
+        if state_num > 255 or state_num < 0:
             is_valid = False
     else:
         # Check if the input symbol is within the ASCII range 32 - 126.
@@ -307,8 +307,12 @@ def read_machine_info(filename):
                     # Check all values in items, if valid or not
                     for i in range(len(items)):
                         is_state = True if i % 2 == 0 else False  # Is a state is in 0th or 2nd index.
-                        if not is_input_valid(items[i], is_state):
+                        if not is_state and items[i] != EPSILON and len((items[i])) > 1:
                             machine_type = INV
+                        elif not is_input_valid(items[i], is_state):
+                            machine_type = INV
+                    if machine_type == INV:
+                        break
     except FileNotFoundError:
         logging.exception(f"The machine file does not exist! Filename: {filename}")
 
